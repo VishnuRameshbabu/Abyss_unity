@@ -9,13 +9,14 @@ public class PlayerController : MonoBehaviour
     //public Rigidbody playerRb;
     public float speed = 1f;
     public float turnSpeed = 10f;
-    
-    // Start is called before the first frame update
+    bool lanternChildPresent = false;
+    public GameObject lantern;
+    public GameObject lightProjectile;
+    public float projectileSpeed=10.0f;
     void Start()
     {
         //playerRb = GetComponent<Rigidbody>();
     }
-
     void playerMovement() {
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
@@ -46,29 +47,41 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    public void launchProjectile() {
+        if (lanternChildPresent == true && Input.GetKeyDown(KeyCode.Space)){
+            Instantiate(lightProjectile,transform.position,transform.rotation);  //To launch Projectiles Smoothly
+        }
+    }
     // Update is called once per frame
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.name == "Lantern")
-        {
-            GameObject lantern = other.gameObject;
+        {   
+
+            lantern = other.gameObject;
             if (Input.GetKeyDown(KeyCode.E))
             {
                 lantern.transform.SetParent(transform);
                 lantern.transform.position = transform.position;
-                lantern.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+                lantern.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);// not necessary but still keeping it
+                DeactivateChild();
             }
+
         }
-        
+       
+
     }
     void DeactivateChild()
     {
-      
-         transform.Find("Lantern_picked").gameObject.SetActive(false);    }  //Deactivates lantern after picking up but remains a child to the player
+        lantern.SetActive(false);
+        lantern.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); // NTS -> objects can be manipulated even after setting it to false
+        lanternChildPresent = true;
+    }  //Deactivates lantern after picking up but remains a child to the player
                                                                                                     
     void Update()
     {
         playerMovement();
-        DeactivateChild();
+        launchProjectile();
+        
 }
 }
